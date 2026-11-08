@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#f6f5f1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121211" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="路线台账">
+<meta name="description" content="上海、苏南、苏中、苏北：公务员、事业编、教师、国企、银行、大厂、外企等 11 条路线的收入、存款、买房、养老对比。可选本科／硕士／博士，男女双视角。">
+<title>路线台账 · 体制内 vs 大厂</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232a6fd6'/%3E%3Cpath d='M14 46 L26 32 L36 38 L50 18' stroke='white' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="stylesheet" href="style.css?v=1">
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">2026 年 11 月口径 · 上海 / 苏南 / 苏中 / 苏北</div>
+  <h1>体制内还是大厂？<br>把一辈子的账摊开算</h1>
+  <p class="lede">选 2–4 条路线（城市 × 岗位 × 学历），页面按年模拟到退休：到手收入、公积金、存款、买房、结婚养娃、养老金，以及 35 岁风险和上岸概率。男女两种视角并排给出。</p>
+  <div class="caveat">
+    <b>先说口径：</b>所有金额都是<b>今天的钱</b>（剔除了通胀），默认人设是<b>普通 211／双一流毕业、转正第一年的中位水平</b>，不是晒 offer 的头部样本。社保基数、退休年龄、育儿补贴等政策用的是已公布的官方数字；体制内到手和大厂起薪来自公开报道与网友工资条的交叉核对，出入可能在 ±15%。数字适合用来<b>排序和判断量级</b>，不适合精确到千元。每个参数都能改，口径和出处写在<a href="#src">页尾</a>。
+  </div>
+</header>
+
+<nav class="toc" id="toc">
+  <a href="#setup">选路线</a>
+  <a href="#overview">总览</a>
+  <a href="#curve">存款曲线</a>
+  <a href="#income">收入构成</a>
+  <a href="#time">时薪</a>
+  <a href="#house">买房</a>
+  <a href="#gender">男女视角</a>
+  <a href="#degree">本科 vs 研究生</a>
+  <a href="#odds">上岸概率</a>
+  <a href="#soft">钱以外</a>
+  <a href="#future">未来判断</a>
+  <a href="#src">口径与出处</a>
+</nav>
+
+<!-- ═══════════ 选路线 ═══════════ -->
+<section id="setup">
+  <h2><span class="idx">01</span>选几条路线来比</h2>
+  <p class="sub">先点一个常见组合，再按自己的情况改。每张卡片＝一条路线：岗位 × 城市 × 学历。</p>
+  <div class="presets" id="presets"></div>
+  <div class="slots" id="slots" style="margin-top:10px"></div>
+
+  <h3>你是谁</h3>
+  <div class="panel">
+    <fieldset>
+      <legend>基本情况</legend>
+      <div class="ctl"><div class="row"><span class="lab">性别视角</span></div>
+        <div class="seg" data-k="gender"><button data-v="m">男</button><button data-v="f">女</button></div>
+        <div class="hint">影响退休年龄（男 63 / 女 58）、预期寿命、婚嫁习俗与生育对职业的影响。<a href="#gender">第 7 节</a>会把两种视角并排算。</div></div>
+      <div class="ctl"><div class="row"><span class="lab">个人竞争力</span></div>
+        <div class="seg" data-k="level"><button data-v="low">普通</button><button data-v="mid">中等</button><button data-v="high">较强</button></div>
+        <div class="hint" id="levelHint"></div></div>
+      <div class="ctl"><div class="row"><span class="lab">读研年限</span><span class="val" data-v="gradYears"></span></div>
+        <div class="seg" data-k="gradYears"><button data-v="2">2 年</button><button data-v="3">3 年</button></div>
+        <div class="hint">博士按硕士 + 4 年算。</div></div>
+      <div class="ctl"><div class="row"><span class="lab">读研每年净花费</span><span class="val" data-v="gradCost"></span></div>
+        <input type="range" data-k="gradCost" min="0" max="6" step="0.5">
+        <div class="hint">学费 + 生活费 − 助学金 / 奖学金 / 助研。计算机专硕学费多在 1–3 万／年。</div></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>家底（已按普通家庭缩放）</legend>
+      <div class="ctl"><div class="row"><span class="lab">家里能支持的钱</span><span class="val" data-v="famPool"></span></div>
+        <input type="range" data-k="famPool" min="0" max="100" step="1">
+        <div class="chips" data-chips="famPool" data-opts="0,5,10,20,30,50,80"></div>
+        <div class="hint">一次性给，用完就没了。下面勾选它可以花在哪里。</div></div>
+      <label class="check"><input type="checkbox" data-k="famDown">补首付</label>
+      <label class="check"><input type="checkbox" data-k="famWed">补婚嫁</label>
+      <label class="check"><input type="checkbox" data-k="famGrad">出读研费用</label>
+      <div class="ctl"><div class="row"><span class="lab">毕业时自己的存款</span><span class="val" data-v="init"></span></div>
+        <input type="range" data-k="init" min="0" max="10" step="0.5"></div>
+      <div class="ctl"><div class="row"><span class="lab">每月给父母</span><span class="val" data-v="parents"></span></div>
+        <input type="range" data-k="parents" min="0" max="3000" step="100"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>生活方式</legend>
+      <div class="ctl"><div class="row"><span class="lab">花钱习惯</span></div>
+        <div class="seg" data-k="life"><button data-v="0.8">节俭</button><button data-v="1">普通</button><button data-v="1.3">宽松</button></div>
+        <div class="hint" id="lifeHint"></div></div>
+      <div class="ctl"><div class="row"><span class="lab">买房前住哪</span></div>
+        <div class="seg" data-k="housing"><button data-v="home">住家里</button><button data-v="share">合租</button><button data-v="whole">整租一居</button></div>
+        <div class="hint">「住家里」只适合在老家城市上班；省房租，生活费按七折。</div></div>
+      <label class="check"><input type="checkbox" data-k="fundRent">买房前用公积金付房租</label>
+      <div class="ctl"><div class="row"><span class="lab">闲钱年化收益（扣通胀后）</span><span class="val" data-v="ret"></span></div>
+        <input type="range" data-k="ret" min="0" max="4" step="0.5">
+        <div class="hint">存款 / 货基 / 国债扣掉通胀后大约 0.5–1.5%，长期指数定投可以期待更高，但有波动。</div></div>
+    </fieldset>
+  </div>
+
+  <h3>人生事件</h3>
+  <div class="panel">
+    <fieldset>
+      <legend>结婚</legend>
+      <label class="check"><input type="checkbox" data-k="marryOn">计入结婚</label>
+      <div class="ctl"><div class="row"><span class="lab">结婚年龄</span><span class="val" data-v="marryAge"></span></div>
+        <input type="range" data-k="marryAge" min="24" max="38" step="1">
+        <div class="hint">2020 年人口普查平均初婚年龄：男 29.4、女 28.0。切换性别时自动跟随。</div></div>
+      <div class="ctl"><div class="row"><span class="lab">婚嫁净支出</span><span class="val" data-v="wed"></span></div>
+        <input type="range" data-k="wed" min="0" max="40" step="1">
+        <div class="hint" id="wedHint"></div></div>
+      <div class="ctl"><div class="row"><span class="lab">婚后买房谁出钱</span></div>
+        <div class="seg" data-k="shareMode"><button data-v="custom">按习俗</button><button data-v="half">对半</button><button data-v="self">全自己</button></div>
+        <div class="hint">「按习俗」＝男方承担约 70% 首付和月供、房产也按比例记。本页按<b>个人</b>记账，不合并配偶。</div></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>买房</legend>
+      <label class="check"><input type="checkbox" data-k="houseOn">计入买房</label>
+      <div class="ctl"><div class="row"><span class="lab">买房年龄</span><span class="val" data-v="buyAge"></span></div>
+        <input type="range" data-k="buyAge" min="24" max="42" step="1"></div>
+      <div class="ctl"><div class="row"><span class="lab">面积</span><span class="val" data-v="area"></span></div>
+        <input type="range" data-k="area" min="60" max="140" step="5"></div>
+      <div class="ctl"><div class="row"><span class="lab">地段系数</span><span class="val" data-v="locMult"></span></div>
+        <input type="range" data-k="locMult" min="0.6" max="2" step="0.05">
+        <div class="hint">1.0＝各城市刚需板块（见第 6 节表）；上海内环、苏州园区核心约 1.6–2.0。</div></div>
+      <div class="ctl"><div class="row"><span class="lab">首付比例</span></div>
+        <div class="seg" data-k="down"><button data-v="15">15%</button><button data-v="20">20%</button><button data-v="30">30%</button></div></div>
+      <div class="ctl"><div class="row"><span class="lab">综合房贷利率</span><span class="val" data-v="rate"></span></div>
+        <input type="range" data-k="rate" min="2.2" max="4" step="0.05">
+        <div class="hint">公积金首套 5 年以上 2.6%，商贷首套普遍 3.0–3.1%，组合贷约 2.8–3.0%。</div></div>
+      <div class="ctl"><div class="row"><span class="lab">房价每年变化（扣通胀）</span><span class="val" data-v="trend"></span></div>
+        <input type="range" data-k="trend" min="-5" max="3" step="0.5">
+        <div class="hint">2026.5 百城二手均价同比 −8%，跌幅在收窄；默认取 −1%／年。</div></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>车与孩子</legend>
+      <label class="check"><input type="checkbox" data-k="carOn">计入买车</label>
+      <div class="ctl"><div class="row"><span class="lab">买车年龄 / 落地价</span><span class="val" id="carV"></span></div>
+        <input type="range" data-k="carAge" min="23" max="40" step="1">
+        <input type="range" data-k="carPrice" min="6" max="30" step="1"></div>
+      <div class="ctl"><div class="row"><span class="lab">孩子数量</span></div>
+        <div class="seg" data-k="kids"><button data-v="0">不要</button><button data-v="1">1 个</button><button data-v="2">2 个</button></div></div>
+      <div class="ctl"><div class="row"><span class="lab">头胎年龄</span><span class="val" data-v="kidAge"></span></div>
+        <input type="range" data-k="kidAge" min="25" max="40" step="1">
+        <div class="hint">二胎按头胎 + 3 年；养娃费用你承担一半，已扣国家育儿补贴（3 岁前每孩每年 3600 元）。</div></div>
+      <div class="ctl"><div class="row"><span class="lab">生育对职业的影响</span></div>
+        <div class="seg" data-k="matMode"><button data-v="stat">按统计规律</button><button data-v="none">不考虑</button></div>
+        <div class="hint">「按统计规律」：女性在企业每生一个孩子，当年奖金减半、晋升顺延一年；体制内当年绩效约 −3%。男性默认不受影响。</div></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>未来情景</legend>
+      <div class="ctl"><div class="row"><span class="lab">体制内财政</span></div>
+        <div class="seg" data-k="fiscal"><button data-v="tight">收紧</button><button data-v="base">基准</button><button data-v="loose">改善</button></div>
+        <div class="hint" id="fiscalHint"></div></div>
+      <div class="ctl"><div class="row"><span class="lab">科技行业</span></div>
+        <div class="seg" data-k="tech"><button data-v="bear">AI 冲击</button><button data-v="base">基准</button><button data-v="bull">景气</button></div>
+        <div class="hint" id="techHint"></div></div>
+      <div class="ctl"><div class="row"><span class="lab">企业员工 35 岁之后</span></div>
+        <div class="seg" data-k="age35"><button data-v="good">稳住</button><button data-v="exp">期望值</button><button data-v="bad">被优化</button></div>
+        <div class="hint" id="age35Hint"></div></div>
+      <label class="check"><input type="checkbox" data-k="commuteOn">时薪里计入通勤时间</label>
+    </fieldset>
+  </div>
+  <div class="toolbar">
+    <button class="btn primary" id="shareBtn">复制当前设置的链接</button>
+    <button class="btn" id="resetBtn">恢复默认</button>
+    <button class="btn" id="themeBtn">外观：跟随系统</button>
+  </div>
+</section>
+
+<!-- ═══════════ 总览 ═══════════ -->
+<section id="overview">
+  <h2><span class="idx">02</span>一屏总览</h2>
+  <p class="sub" id="ovSub">每张卡是一条路线在当前设置下的关键数字。「月均到手」＝全年到手 ÷ 12（含年终）；「全包」＝到手 + 双边公积金 + 年金。</p>
+  <div class="sumcards" id="sumcards"></div>
+</section>
+
+<!-- ═══════════ 曲线 ═══════════ -->
+<section id="curve">
+  <h2><span class="idx">03</span>存款曲线：22 岁到退休</h2>
+  <p class="sub">「净资产」＝现金 + 公积金 + 房产里属于你的部分（房价 − 剩余房贷）。买房那年现金会掉一截，这是钱换成了房子，不是变穷了。悬停或手指按住曲线可看每岁的明细。</p>
+  <div class="card chartcard">
+    <div class="chartbar">
+      <div class="seg" data-k="chartMode"><button data-v="net">净资产</button><button data-v="liquid">现金+公积金</button><button data-v="cum">累计到手</button></div>
+      <div class="seg" data-k="horizon"><button data-v="40">到 40 岁</button><button data-v="50">到 50 岁</button><button data-v="63">到退休</button></div>
+    </div>
+    <div class="chart" id="lineChart"></div>
+    <div class="legend" id="lineLegend"></div>
+  </div>
+  <div class="tablewrap card" style="margin-top:12px;padding:6px 8px"><table id="milestoneTable" class="sticky1"></table></div>
+  <details class="more"><summary>逐年明细表</summary>
+    <div class="tablewrap card" style="padding:6px 8px"><table id="yearTable" class="sticky1"></table></div>
+  </details>
+</section>
+
+<!-- ═══════════ 收入构成 ═══════════ -->
+<section id="income">
+  <h2><span class="idx">04</span>收入构成：第 1、5、10 年</h2>
+  <p class="sub">体制内的钱有相当一块锁在公积金和职业年金里，看「到手」会低估它；大厂的钱几乎全是现金，但更依赖岗位还在。</p>
+  <div class="grid3" id="incomeBars"></div>
+  <div class="legend" style="margin-top:10px">
+    <span class="i"><span class="sw" style="background:var(--ink-2)"></span>到手现金</span>
+    <span class="i"><span class="sw" style="background:var(--baseline)"></span>双边公积金</span>
+    <span class="i"><span class="sw" style="background:var(--surface-3);outline:1px solid var(--baseline)"></span>职业／企业年金</span>
+  </div>
+  <p class="note">企业路线的到手是按页尾的社保基数、个税税率现算的：五险个人 10.5%，公积金按单位比例，减除 6 万／年，租房专项扣除按城市，年终奖单独计税（该政策已延续到 2027 年底）。</p>
+</section>
+
+<!-- ═══════════ 时薪 ═══════════ -->
+<section id="time">
+  <h2><span class="idx">05</span>按小时算：时薪</h2>
+  <p class="sub">年薪高一倍、工时也多一半的话，时薪只高三成。下面用第 5 年的到手收入除以全年实际投入的小时数（工作 + 可选的通勤）。</p>
+  <div class="card"><div class="bars" id="hourBars"></div></div>
+  <p class="note">周工时取常态（含加班）：大厂约 58、中小厂 50、乡镇 50、银行 50、教师 47（备课改作业）、机关 44、外企 42、事业编 40。教师按 40 个工作周（扣寒暑假），其余按 48 周。通勤按城市取往返分钟数：上海 85、苏州 / 南京 60、锡常 45、苏中 40、苏北 35。</p>
+</section>
+
+<!-- ═══════════ 买房 ═══════════ -->
+<section id="house">
+  <h2><span class="idx">06</span>买房：买得起吗，买完还剩多少生活</h2>
+  <p class="sub">同一套购房设置套在每条路线上。月供压力按「公积金冲抵后，每月要从工资里掏的现金 ÷ 月均到手」分档：25% 以下轻松，25–35% 可控，35–50% 吃力，50% 以上高压。</p>
+  <div class="tablewrap card" style="padding:6px 8px"><table id="houseTable" class="sticky1"></table></div>
+  <h3>各城市刚需板块参考（地段系数 1.0）</h3>
+  <div class="tablewrap card" style="padding:6px 8px"><table id="cityTable"></table></div>
+  <p class="note">上海外环外住房限购已在 2025 年大幅放松，江苏各市基本不限购，具体以当年细则为准。公积金贷款额度与缴存年限、余额挂钩，所以「晚两年买」往往能贷得更多。</p>
+</section>
+
+<!-- ═══════════ 男女 ═══════════ -->
+<section id="gender">
+  <h2><span class="idx">07</span>男女双视角：同一条路，账为什么不一样</h2>
+  <p class="sub">其他设置不变，只换性别。差异来自三类：<b>制度</b>（退休年龄、领养老金的年数）、<b>习俗</b>（彩礼／婚房分担）、<b>生育</b>（职业中断）。下表把后两类单独拆出来，你可以判断哪些是自己能改的。</p>
+  <div class="tablewrap card" style="padding:6px 8px"><table id="genderTable" class="sticky1"></table></div>
+  <p class="note" id="genderNote"></p>
+  <div class="gender2" style="margin-top:12px">
+    <div class="card gcol m"><h3>男生要多想的</h3><ul class="tight" id="maleNotes"></ul></div>
+    <div class="card gcol f"><h3>女生要多想的</h3><ul class="tight" id="femaleNotes"></ul></div>
+  </div>
+</section>
+
+<!-- ═══════════ 学历 ═══════════ -->
+<section id="degree">
+  <h2><span class="idx">08</span>本科直接工作 vs 读研再工作</h2>
+  <p class="sub">同一条路线、同一座城，只换学历。读研的代价是晚几年工作 + 学费生活费，回报是起薪更高、晋升更快、上岸概率更高。「追平年龄」＝研究生的净资产第一次追上本科生的那一岁。</p>
+  <div class="tablewrap card" style="padding:6px 8px"><table id="degreeTable" class="sticky1"></table></div>
+  <p class="note" id="degreeNote"></p>
+</section>
+
+<!-- ═══════════ 概率 ═══════════ -->
+<section id="odds">
+  <h2><span class="idx">09</span>把上岸概率乘回去</h2>
+  <p class="sub">前面的曲线都默认「这条路走通了」。这里按每年的上岸／拿 offer 概率，最多试几年，没上岸就留在保底工作，算出 35 岁和 45 岁净资产的<b>期望值</b>。概率是主观先验，请按自己的模考成绩、实习经历拖动。</p>
+  <div class="panel">
+    <fieldset>
+      <legend>备考方式</legend>
+      <div class="ctl"><div class="row"><span class="lab">最多试几年</span></div>
+        <div class="seg" data-k="tries"><button data-v="1">1 年</button><button data-v="2">2 年</button><button data-v="3">3 年</button></div></div>
+      <div class="ctl"><div class="row"><span class="lab">没上岸期间</span></div>
+        <div class="seg" data-k="prepMode"><button data-v="work">在职备考</button><button data-v="full">全职备考</button></div>
+        <div class="hint">全职＝住家、无收入、不交社保；在职＝先干保底工作。</div></div>
+      <div class="ctl"><div class="row"><span class="lab">保底工作</span></div>
+        <select data-k="fallback" id="fallbackSel"></select>
+        <div class="hint">保底工作的城市和学历跟随每张卡片。</div></div>
+    </fieldset>
+    <fieldset id="probBox"><legend>每年上岸概率</legend></fieldset>
+  </div>
+  <div class="tablewrap card" style="margin-top:12px;padding:6px 8px"><table id="oddsTable" class="sticky1"></table></div>
+  <p class="note" id="oddsNote"></p>
+  <p class="note">参考：2027 年度国考约 3.57 万人招录、平均竞争比约 85:1（第三方统计，口径不一）；但竞争比里有大量「裸考」和弃考，认真准备一年的人上岸率远高于 1/85。江苏省考、事业编、教师招聘一年可以考好几次，所以默认概率比国考单次高。</p>
+</section>
+
+<!-- ═══════════ 钱以外 ═══════════ -->
+<section id="soft">
+  <h2><span class="idx">10</span>钱以外的维度</h2>
+  <p class="sub">打分是 1–5 的粗略共识，权重只有你自己能定。把你在乎的拉高，不在乎的拉到 0。「财务」一项按第 9 节的终身期望值在当前几条路线里相对打分。</p>
+  <div class="grid2">
+    <fieldset id="weightBox"><legend>你的权重</legend></fieldset>
+    <div class="card"><div class="bars" id="scoreBars"></div></div>
+  </div>
+  <div class="tablewrap card" style="margin-top:12px;padding:6px 8px"><table id="scoreTable" class="sticky1"></table></div>
+  <h3>这几条路线的特别说明</h3>
+  <ul class="tight note" id="routeNotes" style="font-size:14px"></ul>
+</section>
+
+<!-- ═══════════ 未来判断 ═══════════ -->
+<section id="future">
+  <h2><span class="idx">11</span>我对未来几年的判断</h2>
+  <p class="sub">下面是 2026 年 11 月能看到的事实，以及据此做的推断。每条标了把握程度：<span class="conf h">较有把握</span> 有官方数据支撑；<span class="conf m">中等</span> 方向较清楚、幅度不确定；<span class="conf l">推测</span> 只是一种可能。</p>
+  <div class="judge">
+    <div class="jd"><h4>1. 体制内：名义工资稳中有升，「苏南高绩效」时代已经过去 <span class="conf m">中等</span></h4>
+      <p><b>事实：</b>2023–2024 年苏南多地绩效、年终奖压降（网友普遍说约两成，未见公开文件）；2026 年有国标基本工资上调一档的说法，但具体幅度只有自媒体版本，还没看到官方原文。地方财政仍受土地出让收入下滑拖累。</p>
+      <p><b>推断：</b>未来 5 年体制内收入大概率是「基本工资小步上调 + 绩效持平或微降」，实际购买力年增 2–3%（主要来自晋级晋档，不是普调）。苏南和苏北的差距会继续收窄。<b>编制的核心价值不再是高薪，而是低波动、公积金和职业年金带来的高养老替代率</b>，这一点在终身视角下最明显（见第 7 节养老金列）。</p></div>
+    <div class="jd"><h4>2. 教师：小学和幼儿园已经过剩，初中、高中还有 5–10 年窗口 <span class="conf h">较有把握</span></h4>
+      <p><b>事实：</b>2025 年全国出生人口 792 万，是 1949 年以来的新低，比 2016 年峰值少一半以上；2025 年小学专任教师比上年减少 13.19 万，幼儿园教师两年少了 50 多万。</p>
+      <p><b>推断：</b>出生人口下降像一个波，依次经过小学（现在）→ 初中（约 2030 年起）→ 高中（约 2033 年起）。<b>小学岗位招聘会持续收缩，在编老师可能面临跨校交流、转岗</b>；高中、初中，尤其苏南人口净流入城市，还相对安全。考教师建议优先初高中学段和苏南城市，并尽量拿到硕士学历（苏南高中门槛已普遍抬到硕士）。</p></div>
+    <div class="jd"><h4>3. 大厂：AI 岗翻倍抢人，传统开发岗变窄，中位人拿 offer 更难 <span class="conf m">中等</span></h4>
+      <p><b>事实：</b>2026 届大厂校招总量比上一届扩大，但扩的主要是 AI 研发岗（脉脉称需求同比约 10 倍）；Java、iOS 等基础岗需求明显下滑。头部 offer 白菜档约 39 万／年（字节），但普通院校的现实差距很大：2025 届本科平均月薪 6435 元，计算机类专业已跌出薪资前十。</p>
+      <p><b>推断：</b>收入分布会更像「哑铃」：会用 AI、懂底层的人涨，纯 CRUD 岗被压。对普通 211 本科，<b>「大厂」更现实的入口是中小厂 2–3 年后社招跳入</b>，所以第 9 节默认保底是中小厂。35 岁风险没有消失，只是被 AI 提前到了更早的「是否可替代」测试。</p></div>
+    <div class="jd"><h4>4. 房价：二线以下还在找底，上海核心先企稳 <span class="conf m">中等</span></h4>
+      <p><b>事实：</b>2026 年 5 月百城二手住宅均价同比 −8%，跌幅收窄；上海二手价已出现环比上涨；苏北三四线挂牌价仍在同比两位数下跌。</p>
+      <p><b>推断：</b>刚需不必抢在 2027 年前上车。体制内的人用公积金低息贷款、晚两年额度更高，可以等婚事近了再买；在上海的企业员工，买房的真正门槛是首付和收入稳定性，不是限购。<b>本页默认房价 −1%／年，属于偏谨慎的假设</b>。</p></div>
+    <div class="jd"><h4>5. 延迟退休：多干几年，养老金门槛也在抬 <span class="conf h">较有把握</span></h4>
+      <p><b>事实：</b>2025 年 1 月起渐进延迟退休：男职工 60→63、女干部 55→58、女工人 50→55；2030 年起最低缴费年限从 15 年每年加半年，逐步提到 20 年。</p>
+      <p><b>推断：</b>2004 年后出生的人基本按新标准走满。工作年限更长，对<b>身体和岗位可持续性</b>的要求更高——这对 45 岁以后还能不能留在企业一线是更严峻的问题，对体制内则意味着多 3 年工资和缴费。女性退休早、寿命长，领养老金的年数比男性多 7–10 年。</p></div>
+    <div class="jd"><h4>6. 生育：补贴有了，但对女性职业的隐性代价仍主要在企业 <span class="conf m">中等</span></h4>
+      <p><b>事实：</b>国家育儿补贴自 2025 年起，每孩每年 3600 元发到 3 岁（免个税）；沪苏产假均约 158 天。</p>
+      <p><b>推断：</b>补贴大约覆盖头三年养娃成本的一到两成，起不到决定作用。<b>企业里的「母职惩罚」主要体现在当年绩效和晋升顺延</b>，体制内影响小得多。这也是女生在江苏普遍更偏好编制的理性原因之一，第 7 节把它单独量化了。</p></div>
+    <div class="jd"><h4>7. 考公考编：报名热度见顶，但「上岸难」不会缓解 <span class="conf l">推测</span></h4>
+      <p><b>事实：</b>2026 年度国考首次缩招（约 −4%），2027 年度招 3.57 万人、报名仍在 300 万上下。</p>
+      <p><b>推断：</b>编制总量从紧 + 毕业生数量高位，未来 3–5 年竞争比大概率维持高位。应届身份是最值钱的一年，<b>先考公后找工作不冲突：秋招拿 offer、签三方不入职不缴社保，应届身份仍在</b>。</p></div>
+    <div class="jd"><h4>8. 银行与国企：稳定性分化 <span class="conf m">中等</span></h4>
+      <p><b>事实：</b>银行业净息差持续收窄，2023 年来普遍降薪、绩效延付和追索。</p>
+      <p><b>推断：</b>银行更像「带编制外壳的销售岗」，稳定性低于国企；电网、烟草等头部国企仍是「体制内的高薪档」，但校招越来越偏好硕士和名校。</p></div>
+  </div>
+</section>
+
+<!-- ═══════════ 口径 ═══════════ -->
+<section id="src">
+  <h2><span class="idx">12</span>口径与出处</h2>
+  <div class="grid2">
+    <div class="card">
+      <h3 style="margin-top:0">模型怎么算</h3>
+      <ul class="tight" style="font-size:14.5px">
+        <li><b>按年模拟</b>：22 岁本科毕业，硕士 +2/3 年、博士再 +4 年；工作到法定退休年龄（男 63、女 58）。</li>
+        <li><b>体制内与国企</b>直接用「年到手」口径（含年终、扣完五险一金和个税），第一年试用期按 9 折。</li>
+        <li><b>企业</b>用税前月 base 现算：五险个人 10.5%，公积金按单位比例，个税按综合所得税率表，年终奖单独计税，首年年终按半年折算。</li>
+        <li><b>增长</b>是剔除通胀后的实际增长：体制内第 1–10 年约 3%（晋级晋档、职级并行），大厂约 7%（含跳槽），之后逐段放缓。</li>
+        <li><b>养老金</b>按现行计发办法：基础养老金＝社平 ×（1＋平均缴费指数）÷ 2 × 缴费年数 × 1%，加个人账户和职业／企业年金余额 ÷ 计发月数（63 岁 117、58 岁 152），再统一打 9 折，留出未来调整放缓的余量。</li>
+        <li><b>没算进去的</b>：配偶收入（本页按个人记账）、继承、投资大起大落、副业、重大疾病。已婚双职工的真实曲线会好于图上任何一条。</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">关键数字核对表</h3>
+      <div class="tablewrap"><table>
+        <tr><th>项目</th><th>取值</th><th>状态</th></tr>
+        <tr><td>上海社保基数（2026.7 起）</td><td class="num">7546–37731</td><td>官方已公布</td></tr>
+        <tr><td>江苏社保基数（2026 年度）</td><td class="num">5025–25127</td><td>官方已公布</td></tr>
+        <tr><td>上海社平工资（2025 年度）</td><td class="num">12577 元／月</td><td>官方已公布</td></tr>
+        <tr><td>延迟退休（男／女干部）</td><td class="num">63 / 58 岁</td><td>法律已通过</td></tr>
+        <tr><td>育儿补贴</td><td class="num">3600 元／年／孩</td><td>国家方案</td></tr>
+        <tr><td>2025 届本科月薪（麦可思）</td><td class="num">6435 元</td><td>第三方报告</td></tr>
+        <tr><td>2026 届大厂白菜档</td><td class="num">约 30–40 万</td><td>offer 汇总</td></tr>
+        <tr><td>苏州教师到手（网友样本）</td><td class="num">约 19–23 万</td><td>个例，偏高</td></tr>
+        <tr><td>苏州事业编全包（网友）</td><td class="num">约 16 万</td><td>个例</td></tr>
+        <tr><td>徐州区级公务员全包</td><td class="num">约 15 万</td><td>公考机构估算</td></tr>
+        <tr><td>2026 国标工资调整</td><td class="num">幅度未定</td><td>仅自媒体，未计入</td></tr>
+      </table></div>
+    </div>
+  </div>
+  <h3>出处（2026 年 11 月检索）</h3>
+  <ol class="srcs">
+    <li><a href="https://www.yzwb.net/news/jiangsu/202610/t20261008_400495.html" target="_blank" rel="noopener">江苏公布 2026 年度社保缴费基数上下限</a> <span class="d">扬子晚报 · 2026-10</span></li>
+    <li><a href="https://www.kaizencpa.com/download/china/2026%20Shanghai%20New%20Social%20Security%20&amp;%20HPF%20Base%20Rules(CHS).pdf" target="_blank" rel="noopener">上海 2026 年度社保、公积金基数</a> <span class="d">2026-08</span>；<a href="https://www.thepaper.cn/newsDetail_forward_33567909" target="_blank" rel="noopener">上海公积金 2026 年度基数问答</a> <span class="d">澎湃</span></li>
+    <li><a href="https://www.bjnews.com.cn/detail/1726212381129271.html" target="_blank" rel="noopener">渐进式延迟法定退休年龄决定解读</a> <span class="d">新京报 · 2024-09</span></li>
+    <li><a href="https://www.news.cn/politics/20250728/f7b563a2801a4b8da497ccb1b9ee3ea8/c.html" target="_blank" rel="noopener">育儿补贴制度实施方案</a> <span class="d">新华社 · 2025-07</span></li>
+    <li><a href="https://finance.sina.com.cn/wm/2026-08-08/doc-inimrerp6345025.shtml" target="_blank" rel="noopener">2025 年小学教师减少 13.19 万</a> <span class="d">新浪财经 · 2026-08</span>；<a href="https://news.eol.cn/yaowen/202607/t20260720_2757577.shtml" target="_blank" rel="noopener">幼儿园少了 63 万老师</a> <span class="d">中国教育在线</span></li>
+    <li><a href="https://www.yicai.com/news/103278110.html" target="_blank" rel="noopener">麦可思：2025 届本科毕业生月收入</a> <span class="d">第一财经 · 2026</span></li>
+    <li><a href="https://www.xiaolincoding.com/salary/class_2026.html" target="_blank" rel="noopener">互联网 26 届校招薪资盘点</a>、<a href="https://notes.kamacoder.com/salary/yearly/2026.html" target="_blank" rel="noopener">2026 校招薪资报告</a>、<a href="https://developer.aliyun.com/article/1744148" target="_blank" rel="noopener">2026 大厂应届生起薪</a> <span class="d">offer 汇总，样本自报</span></li>
+    <li><a href="https://www.jiemian.com/article/13152361.html" target="_blank" rel="noopener">大厂 2026 届校招扩招，AI 岗需求约增 10 倍</a> <span class="d">界面新闻</span></li>
+    <li><a href="https://www.eol.cn/kaoshi/gwy/gjgwy/202610/t20261022_2785177.shtml" target="_blank" rel="noopener">2027 国考报名数据</a> <span class="d">中国教育在线 · 2026-10</span></li>
+    <li><a href="https://m.fang.com/fangjia/fjmap.html" target="_blank" rel="noopener">2026 年 10 月全国房价指数</a>、<a href="https://suzhou.anjuke.com/fangjia/suzhou2026/" target="_blank" rel="noopener">安居客苏州房价</a>、<a href="https://www.finet.hk/newscenter/print_content/6a1f7303230829529eddeca6" target="_blank" rel="noopener">中指百城二手价</a> <span class="d">挂牌口径，平台间差异大</span></li>
+    <li><a href="https://k.sina.cn/article_7625193715_1c67f38f302001enwg.html" target="_blank" rel="noopener">苏州事业单位降薪后待遇分享</a>、<a href="https://zhuanlan.zhihu.com/p/2035012190504268981" target="_blank" rel="noopener">2026 江苏事业单位薪资明细</a> <span class="d">网友口径，仅作交叉参考</span></li>
+  </ol>
+</section>
+
+<footer>
+  <p><b>局限：</b>① 2030 年以后的行情、房价、利率都不可知，本页按 2026 年口径外推，并用「情景」开关表达不确定性；② 体制内到手各区县差异很大（同在苏州，园区与姑苏可以差 3–5 万），最可靠的永远是目标单位在职者的工资条；③ 概率是主观先验，你自己的模考和实习数据比任何默认值更有发言权。本页只做决策辅助，不构成就业、投资建议。</p>
+  <p>数据与计算全部在你的浏览器里完成，不上传任何信息。设置会保存在本机。</p>
+</footer>
+
+</div>
+<div class="toast" id="toast"></div>
+<script src="data.js?v=1"></script>
+<script src="app.js?v=1"></script>
+</body>
+</html>
